@@ -4,7 +4,7 @@ const router = require("express").Router();
 
 router.get("/", (req, res) => {
   console.log("idex page hit")
-  res.render("index")
+  res.render("index", { isLoggedIn: false })
 })
 
 module.exports = router;
