@@ -7,7 +7,8 @@ require("dotenv").config();
 
 
 
-
+const bcrypt = require("bcrypt");
+const saltRounds = 12;
 const expireTime = 24 * 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
 const mongodb_user = process.env.MONGODB_USER;
