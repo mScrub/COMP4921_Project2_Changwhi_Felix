@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.1",
     "bulma": "^0.9.4",
     "connect-mongo": "^5.0.0",
     "dotenv": "^16.3.1",
