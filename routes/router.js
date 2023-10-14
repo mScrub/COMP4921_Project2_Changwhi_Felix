@@ -1,13 +1,14 @@
 const router = require("express").Router();
 const MongoStore = require("connect-mongo");
 const session = require("express-session");
-
+const Joi = require("joi");
+const bcrypt = require("bcrypt");
 require("dotenv").config();
 
 
 
 
-const bcrypt = require("bcrypt");
+
 const saltRounds = 12;
 const expireTime = 24 * 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
