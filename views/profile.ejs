@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<%- include("templates/header") %>
+  <body>
+    <section class="section">
+      <div class="maincolumns columns is-desktop is-vcentered">
+        <div class="column is-10 is-rounded is-offset-1 is-light box container">
+          <div class="column">
+            <h1 class="title is-1">Profile</h1>
+          </div>
+          <div class="column is-centered">
+            <span style="padding-right: 16px;" style="margin-bottom: 0;" class="title is-4">Name: </span>
+            <span class="title is-6">Changwhi's</span>
+        </div>
+        <div class="column is-centered" style="display: flex; align-items: center;">
+            <span style="padding-right: 16px;" class="title is-4">Picture: </span>
+            <img style="width: 100px; height: 100px;"/>        
+        </div>
+          <div class="column">
+            <div class="columns is-centered">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Threads</th>
+                    <th># Comments</th>
+                    <th># Likes</th>
+                    <th>Last Update</th>
+                  </tr>
+                </thead>
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+           <div class="column">
+            <div class="column is-centered">
+                <form action="/addThread" method="post" style="text-align: center;">
+                    <div class="flex-container" style="display: flex; align-items: center; justify-content: center;">
+                        <button class="button is-primary is-rounded">
+                            <span class="icon is-small">
+                                <i class="fas fa-plus"></i>
+                            </span>
+                        </button>
+                        <span style="padding-left: 12px;">Add New Thread</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>

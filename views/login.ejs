@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+
+<%- include("templates/header") %>
+
+  <body>
+
+    <section class="section">
+      <div class="maincolumns columns is-desktop is-vcentered">
+        <div class="column is-4 is-offset-4 notification is-info is-light container" style="border-radius: 25px;">
+          <!-- Logging in with creds -->
+          <form action="/loggingin" method="post">
+            <div class="field">
+              <p class="control has-icons-left has-icons-right">
+                <input class="input" name="email" type="email" placeholder="Email" />
+                <span class="icon is-small is-left">
+                  <i class="fas fa-envelope"></i>
+                </span>
+                <span class="icon is-small is-right">
+                  <i class="fas fa-check"></i>
+                </span>
+              </p>
+            </div>
+            <div class="field">
+              <p class="control has-icons-left">
+                <input class="input" name="password" type="password" placeholder="Password" />
+                <span class="icon is-small is-left">
+                  <i class="fas fa-lock"></i>
+                </span>
+              </p>
+              <% if (locals.message) {%>
+                <p class="help is-danger"> <%= message %></p>
+                <% }%>
+            </div>
+            <div class="field">
+              <p class="control">
+                <button class="button is-dark">Login</button>
+              </p>
+            </div>
+          </form>
+          <!-- Sign up Page -->
+          <form action="/signup" method="get">
+            <div class="field">
+              <p class="control">
+                <button class="button is-success">Sign up</button>
+              </p>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  </body>
+
+</html>
