@@ -161,6 +161,9 @@ router.post("/submitUser", async (req, res) => {
   }
 });
 
+router.get('/profile', (req, res) => {
+  res.render('profile', {message: "Profile", isLoggedIn: false})
+})
 
 
 function isValidSession(req) {
