@@ -168,7 +168,7 @@ router.post("/submitUser", async (req, res) => {
     } else if (errorMsg.includes("(?=.*[0-9])")) {
       errorMsg = "Password needs to have 1 number.";
     }
-    res.render("signup", { message: errorMsgPW, isLoggedIn: false });
+    res.render("signup", { message: errorMsg, isLoggedIn: false });
     return;
   } else {
     var success = await db_users.createUser({ email: email, hashedPassword: hashedPassword, name: name });
