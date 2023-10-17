@@ -4,9 +4,12 @@ const session = require("express-session");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 require("dotenv").config();
+// mySQL
+const db_users = include('database/users');
 
-
-
+const passwordSchema = Joi.object({
+  password: Joi.string().pattern(/(?=.*[a-z])/).pattern(/(?=.*[A-Z])/).pattern(/(?=.*[!@#$%^&*])/).pattern(/(?=.*[0-9])/).min(12).max(50).required()
+});const db_users = include('database/users');
 
 
 const saltRounds = 12;
