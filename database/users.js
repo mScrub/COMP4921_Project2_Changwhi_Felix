@@ -37,8 +37,6 @@ async function getUsers() {
 
 	try {
 		const results = await mySqlDatabase.query(getUsersSQL);
-
-        console.log("Successfully retrieved users");
 		// console.log(results[0]);
 		return results[0];
 	}
