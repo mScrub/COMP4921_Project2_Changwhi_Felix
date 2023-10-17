@@ -3,45 +3,20 @@
 
 <%- include("templates/header") %>
 
-<body>
+  <body>
 
     <section class="section">
-        <div class="maincolumns columns is-desktop is-vcentered">
-            <div class="column is-4 is-offset-4 has-background-light is-light container" style="border-radius: 25px;">
-                <!-- Logging in with creds -->
-                <div class="field">
-                    <p class="control has-icons-left has-icons-right">
-                        <input class="input" name="email" type="email" placeholder="Email" />
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-envelope"></i>
-                        </span>
-                    </p>
-                </div>
-                <div class="field">
-                    <p class="control has-icons-left">
-                        <input class="input" name="password" type="password" placeholder="Password" />
-                        <span class="icon is-small is-left">
-                            <i class="fas fa-lock"></i>
-                        </span>
-                    </p>
-                    <% if (locals.message) {%>
-                        <p class="help is-danger"> <%= message %></p>
-                    <% }%>
-                </div>
-                <div class="columns">
-                    <div class="column is-2">
-                        <form action="/loggingin" method="post">
-                            <button class="button is-dark">Login</button>
-                        </form>
-                    </div>
-                    <div class="column">
-                        <form action="/signup" method="get">
-                            <div class="control">
-                                <button class="button is-success">Sign up</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+      <div class="maincolumns columns is-desktop is-vcentered">
+        <div class="column is-4 is-offset-4 has-background-light is-light container" style="border-radius: 25px;">
+          <!-- Logging in with creds -->
+          <form action="/loggingin" method="post">
+            <div class="field">
+              <p class="control has-icons-left has-icons-right">
+                <input class="input" name="email" type="email" placeholder="Email" />
+                <span class="icon is-small is-left">
+                  <i class="fas fa-envelope"></i>
+                </span>
+              </p>
             </div>
             <div class="field">
               <p class="control has-icons-left">
@@ -56,22 +31,21 @@
                 </p>
                 <% }%>
             </div>
-            <div class="columns is-1">
+            <div class="columns is-mobile ">
               <div class="column is-3">
-                <p class="control">
-                  <button class="button is-dark">Login</button>
-                </p>
+                <button class="button is-light">Login</button>
               </div>
-              <div class="column is-2">
+              <div class="column">
                 <a href="/signup" class="button is-primary">
                   <strong>Sign up</strong>
                 </a>
               </div>
-
+            </div>
           </form>
-          <!-- Sign up Page -->
         </div>
+      </div>
+      </div>
     </section>
-</body>
+  </body>
 
 </html>

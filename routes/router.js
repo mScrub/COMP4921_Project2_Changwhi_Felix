@@ -6,12 +6,6 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 // mySQL
 const db_users = include('database/users');
-
-const passwordSchema = Joi.object({
-  password: Joi.string().pattern(/(?=.*[a-z])/).pattern(/(?=.*[A-Z])/).pattern(/(?=.*[!@#$%^&*])/).pattern(/(?=.*[0-9])/).min(12).max(50).required()
-});const db_users = include('database/users');
-
-
 const saltRounds = 12;
 const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
@@ -118,10 +112,10 @@ router.post("/loggingin", async (req, res) => {
     return;
   }
 
-  const validationResult = passwordSchema.validate({password: password});
+  const validationResult = passwordSchema.validate({ password: password });
   if (validationResult.error) {
     let errorMsg = validationResult.error.details[0].message;
-    
+
     if (errorMsg.includes("(?=.*[a-z])")) {
       errorMsg = "Password must have at least 1 lowercase.";
     } else if (errorMsg.includes("(?=.*[A-Z])")) {
@@ -145,7 +139,7 @@ router.post("/loggingin", async (req, res) => {
     req.session.authenticated = true;
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
-    res.render('index', { isLoggedIn: true });
+    res.render("index", { isLoggedIn: true })
   } else {
     req.session.authenticated = false;
     res.redirect('/login');
@@ -164,7 +158,7 @@ router.post("/submitUser", async (req, res) => {
 
   if (validationResult.error) {
     let errorMsg = validationResult.error.details[0].message;
-    
+
     if (errorMsg.includes("(?=.*[a-z])")) {
       errorMsg = "Password must have at least 1 lowercase.";
     } else if (errorMsg.includes("(?=.*[A-Z])")) {
@@ -180,8 +174,7 @@ router.post("/submitUser", async (req, res) => {
     var success = await db_users.createUser({ email: email, hashedPassword: hashedPassword, name: name });
 
     if (success) {
-      res.redirect('/');
-      return;
+      res.render("index", { isLoggedIn: true })
     } else {
       res.render('error', { message: `Failed to create the user ${email}, ${name}`, title: "User creation failed" });
     }
