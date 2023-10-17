@@ -12,7 +12,7 @@ const passwordSchema = Joi.object({
 });
 
 const saltRounds = 12;
-const expireTime = 24 * 60 * 60 * 1000; // session expire time, persist for 1 hour.
+const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
@@ -84,7 +84,7 @@ router.post("/loggingin", async (req, res) => {
       break;
     }
   }
-  
+
   if (user === undefined) {
     res.render('login', { message: "Why did you enter the wrong email?!", isLoggedIn: false });
     return;
