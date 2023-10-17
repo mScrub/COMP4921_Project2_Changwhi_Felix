@@ -7,7 +7,9 @@ require("dotenv").config();
 
 
 
-
+const passwordSchema = Joi.object({
+  password: Joi.string().pattern(/(?=.*[a-z])/).pattern(/(?=.*[A-Z])/).pattern(/(?=.*[!@#$%^&*])/).pattern(/(?=.*[0-9])/).min(12).max(50).required()
+});
 
 const saltRounds = 12;
 const expireTime = 24 * 60 * 60 * 1000; // session expire time, persist for 1 hour.
@@ -71,7 +73,6 @@ router.get("/signup", async (req, res) => {
 
 
 router.post("/loggingin", async (req, res) => {
-  const passwordSchema = Joi.string().pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}$')).required();
   var email = req.body.email;
   var password = req.body.password;
   var users = await db_users.getUsers();
