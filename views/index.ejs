@@ -1,12 +1,150 @@
 <!DOCTYPE html>
 <html>
-
 <%- include("templates/header") %>
 
   <body>
-    <div class="column is-8 is-offset-2 container">
-      <p>test</p>
-    </div>
+    <section class="section has-background-light">
+      <div class="maincolumns columns is-desktop">
+        <div class="column is-10 is-offset-1 has-background-white" style="border-radius: 25px;">
+
+          <div class="tabs is-centered">
+            <ul>
+              <li class="is-active" onclick="showBest()">
+                <a>
+                  <span class="icon is-small"><i class="fas fa-image" aria-hidden="true"></i></span>
+                  <span>Best</span>
+                </a>
+              </li>
+              <li onclick="showThread()">
+                <a>
+                  <span class="icon is-small"><i class="fas fa-music" aria-hidden="true"></i></span>
+                  <span>Thread</span>
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          <div class='bestContent'>
+            <div class='column has-text-centered'>
+              <h1 class="title">Best Topic</h1>
+            </div>
+            <div class='columns'>
+              <div class='column is-one-third'>
+                <article class="message is-primary" style="width: 100%;">
+                  <div class="message-header">
+                    <p>First</p>
+                  </div>
+                  <div class="message-body">
+                    Sample1
+                  </div>
+                </article>
+              </div>
+
+              <div class='column is-one-third'>
+                <article class="message is-primary" style="width: 100%;">
+                  <div class="message-header">
+                    <p>Second</p>
+                  </div>
+                  <div class="message-body">
+                    Sample2
+                  </div>
+                </article>
+              </div>
+
+              <div class='column is-one-third'>
+                <article class="message is-primary" style="width: 100%;">
+                  <div class="message-header">
+                    <p>Third</p>
+                  </div>
+                  <div class="message-body">
+                    Sample3
+                  </div>
+                </article>
+              </div>
+
+            </div>
+
+            <div class='column is-10 is-offset-1 has-text-centered'>
+              <h1 class="title"> Search </h1>
+              <div class="panel-block">
+                <p class="control has-icons-left">
+                  <input class="input is-primary" type="text" placeholder="Search">
+                  <span class="icon is-left">
+                    <i class="fas fa-search" aria-hidden="true"></i>
+                  </span>
+                </p>
+              </div>
+              <a class="panel-block is-active">
+                <span class="panel-icon">
+                  <i class="fas fa-book" aria-hidden="true"></i>
+                </span>
+                bulma
+              </a>
+              <a class="panel-block">
+                <span class="panel-icon">
+                  <i class="fas fa-book" aria-hidden="true"></i>
+                </span>
+                marksheet
+              </a>
+              <a class="panel-block">
+                <span class="panel-icon">
+                  <i class="fas fa-book" aria-hidden="true"></i>
+                </span>
+                minireset.css
+              </a>
+              <a class="panel-block">
+                <span class="panel-icon">
+                  <i class="fas fa-book" aria-hidden="true"></i>
+                </span>
+                jgthms.github.io
+              </a>
+            </div>
+          </div>
+
+          <div class='threadContent' style='display: none'>
+            <p>Hi</p>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+
+    <script>
+      function showBest() {
+        const threadIcon = document.querySelectorAll('li')[1];
+        const bestIcon = document.querySelectorAll('li')[0];
+        const bestContent = document.querySelector('.bestContent');
+        const threadContent = document.querySelector('.threadContent');
+
+        if (threadIcon.classList.contains('is-active')) {
+          threadIcon.classList.remove('is-active');
+        }
+        if (!bestIcon.classList.contains('is-active')) {
+          bestIcon.classList.add('is-active');
+        }
+
+        bestContent.style.display = 'block';
+        threadContent.style.display = 'none';
+      }
+
+      function showThread() {
+        const threadIcon = document.querySelectorAll('li')[1];
+        const bestIcon = document.querySelectorAll('li')[0];
+        const bestContent = document.querySelector('.bestContent');
+        const threadContent = document.querySelector('.threadContent');
+
+        if (bestIcon.classList.contains('is-active')) {
+          bestIcon.classList.remove('is-active');
+        }
+        if (!threadIcon.classList.contains('is-active')) {
+          threadIcon.classList.add('is-active');
+        }
+
+        bestContent.style.display = 'none';
+        threadContent.style.display = 'block';
+      }
+    </script>
   </body>
 
 </html>
