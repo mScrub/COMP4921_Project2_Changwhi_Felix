@@ -9,7 +9,7 @@ const db_users = include('database/users');
 const db_image = include('database/picture');
 
 const saltRounds = 12;
-const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
+const expireTime = 24 * 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
 
 const cloudinary = require("cloudinary");

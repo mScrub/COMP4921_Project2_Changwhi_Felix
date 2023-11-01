@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <%- include("templates/header") %>
+
   <body>
     <script type="text/javascript">
       $.cloudinary.config({
@@ -20,101 +21,97 @@
           </div>
           <div class="column is-centered" style="display: flex; align-items: center;">
             <span style="padding-right: 16px;" class="title is-4">Picture: </span>
-            <% if (locals.allPics) { %>
               <div class="table-container">
+                <% if (locals.allPics && locals.allPics.length > 0) { %>
                 <table class="table is-bordered is-hoverable is-striped is-fullwidth">
                   <thead>
-                    <tr>
-                      <th>Picture Name</th>
-                      <th>Picture</th>
-                      <th>Remove</th>
-                    </tr>
                   </thead>
                   <% let i=0; %>
-                  <% for(i=0; i < allPics.length; i++) { %>
-                    <tr>
-                      <td>
-                        <%= allPics[i]['name'] %>
-                      </td>
-                      <% if (allPics[i]['public_id']) { %>
-                        <td colspan="1">
-                          <script type="text/javascript">
-                            document.write(
-                              $.cloudinary
-                                .imageTag("<%- allPics[i]['public_id']%>", {
-                                  height: 100,
-                                  width: 100,
-                                  crop: "fit",
-                                })
-                                .toHtml()
-                            );
-                          </script>
-                        <% } else { %>
-                        </td>
-                        <td colspan="1">
-                          <form action="/setUserPic" method="post" enctype="multipart/form-data">
-                            <div class="field is-horizontal">
-                              <input type="hidden" name="pic_id" value="<%= allPics[i]['picture_UUID']%>" />
-                              <div id="picture-upload" class="file is-info has-name is-small is-right">
-                                <label class="file-label">
-                                  <input class="file-input" type="file" name="image" />
-                                  <span class="file-cta">
-                                    <span class="file-icon"><i class="fas fa-upload"></i></span>
-                                    <span class="file-label">Choose a file…</span>
-                                  </span>
-                                  <span class="file-name">No File</span>
-                                </label>
+                    <% for(i=0; i < allPics.length; i++) { %>
+                      <tr>
+                        <% if (allPics[i]['public_id']) { %>
+                          <td colspan="1">
+                            <script type="text/javascript">
+                              document.write(
+                                $.cloudinary
+                                  .imageTag("<%- allPics[i]['public_id']%>", {
+                                    height: 100,
+                                    width: 100,
+                                    crop: "fit",
+                                  })
+                                  .toHtml()
+                              );
+                            </script>
+                            <% } else { %>
+                          </td>
+                          <td colspan="1">
+                            <form action="/setUserPic" method="post" enctype="multipart/form-data">
+                              <div class="field is-horizontal">
+                                <input type="hidden" name="pic_id" value="<%= allPics[i]['picture_UUID']%>" />
+                                <div id="picture-upload" class="file is-info has-name is-small is-right">
+                                  <label class="file-label">
+                                    <input class="file-input" type="file" name="image" />
+                                    <span class="file-cta">
+                                      <span class="file-icon"><i class="fas fa-upload"></i></span>
+                                      <span class="file-label">Choose a file…</span>
+                                    </span>
+                                    <span class="file-name">No File</span>
+                                  </label>
+                                </div>
+                                &nbsp;
+                                <div class="field">
+                                  <button class="button is-link is-small">
+                                    <span>Upload</span>
+                                    <span class="icon is-small">
+                                      <i class="fas fa-image"></i>
+                                    </span>
+                                  </button>
+                                </div>
                               </div>
-                              &nbsp;
-                              <div class="field">
-                                <button class="button is-link is-small">
-                                  <span>Upload</span>
-                                  <span class="icon is-small">
-                                    <i class="fas fa-image"></i>
-                                  </span>
-                                </button>
-                              </div>
-                            </div>
-                          </form>
-                        <% } %>
-                        </td>
-                        <td>
-                          <a href="/deletePics?id=<%= allPics[i]['public_id']%>&picture_UUID=<%= allPics[i]['picture_UUID']%>&pic=<%=true%>">
-                            <span class="icon is-small">
-                              <i class="fas fa-eraser"></i>
-                            </span>
-                          </a>
-                        </td>
-                    </tr>
-                  <% } %>
+                            </form>
+                            <% } %>
+                          </td>
+                          <td>
+                            <a
+                              href="/deletePics?id=<%= allPics[i]['public_id']%>&picture_UUID=<%= allPics[i]['picture_UUID']%>&pic=<%=true%>">
+                              <span class="icon is-small">
+                                <i class="fas fa-eraser"></i>
+                              </span>
+                            </a>
+                          </td>
+                      </tr>
+                      <% } %>
                 </table>
+                <% } %>
               </div>
-            <% } %>
           </div>
           <form action="/addpic" method="post">
-            <div class="field is-horizontal">
-              <div class="field-label is-normal">
-                <label class="label">Add pictures</label>
-              </div>
-              <div class="field-body">
-                <div class="field">
-                  <p class="control is-expanded">
-                    <input name="pic_name" class="input" type="text" placeholder="Picture Name" />
-                  </p>
+            <% if (!locals.allPics || locals.allPics.length <= 0) { %>
+              <div class="field is-horizontal">
+                <div class="field-label is-normal">
+                  <label class="label">Add profile picture</label>
                 </div>
-                <div class="field">
-                  <button class="button is-dark">
-                    <span>Add</span>
-                    <span class="icon is-small">
-                      <i class="fas fa-user"></i>
-                    </span>
-                  </button>
+                <div class="field-body">
+                  <div class="field" style="max-width: 250px;">
+                    <p class="control">
+                      <input name="pic_name" class="input" type="text" placeholder="Picture Name" />
+                    </p>
+                  </div>
+                  <div class="field">
+                    <button class="button is-dark">
+                      <span>Add</span>
+                      <span class="icon is-small">
+                        <i class="fas fa-user"></i>
+                      </span>
+                    </button>
+                  </div>
                 </div>
               </div>
-            </div>
+              <% } %>
           </form>
         </div>
       </div>
+      
       <div class="column">
         <div class="columns is-centered">
           <table class="table">
@@ -147,4 +144,5 @@
       </div>
     </section>
   </body>
+
 </html>
