@@ -6,8 +6,24 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 // mySQL
 const db_users = include('database/users');
+const db_image = include('database/picture');
+
 const saltRounds = 12;
 const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
+
+
+const cloudinary = require("cloudinary");
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_CLOUD_KEY,
+  api_secret: process.env.CLOUDINARY_CLOUD_SECRET,
+});
+
+
+const multer = require("multer");
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
 
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
@@ -185,6 +201,178 @@ router.get('/profile', (req, res) => {
   const isLoggedIn = isValidSession(req)
   res.render('profile', { message: "Profile", isLoggedIn: isLoggedIn})
 })
+
+// BEAUTIFUL PICTURES OF CHANGWHI~ */
+
+router.get("/showPics", sessionValidation, async (req, res) => {
+  console.log("picture page");
+  try {
+    let user_id = req.session.userID;
+    //req.query.id;
+    console.log("userId: " + user_id);
+
+    // Joi validate
+    const schema = Joi.object({
+      user_id: Joi.number().integer().min(1).required(),
+    });
+
+    const validationResult = schema.validate({ user_id });
+    if (validationResult.error != null) {
+      console.log(validationResult.error);
+
+      res.render("error", { message: "Invalid user_id" });
+      return;
+    }
+    console.log("Retrieving column and ", req.session.userID)
+    let responseData = await db_image.getColumn({ user_id: user_id })
+    console.log("in show pices", responseData[0])
+    if (!responseData) {
+      res.render('error', { message: `Failed to retrieve columns, ` })
+    }
+    res.render('profile', { allPics: responseData[0], user_id: user_id });
+
+  } catch (ex) {
+    res.render("error", { message: "Error connecting to MongoDB" });
+    console.log("Error connecting to MongoDB");
+    console.log(ex);
+  }
+});
+
+router.post("/addpic", async (req, res) => {
+  try {
+    console.log("addpic form submit");
+
+    let user_id = req.session.userID;
+
+    const schema = Joi.object({
+      user_id: Joi.number().integer().min(1).required(),
+      name: Joi.string().alphanum().min(2).max(50).required(),
+      // comment: Joi.string().alphanum().min(0).max(150).required(),
+    });
+    const validationResult = schema.validate({
+      user_id,
+      name: req.body.pic_name,
+      // comment: req.body.comment,
+    });
+    if (validationResult.error != null) {
+      console.log(validationResult.error);
+      res.render("error", { message: "Invalid first_name, last_name, email" });
+      return;
+    }
+
+    console.log("addColumn and ", req.session.userID)
+    let responseData = await db_image.addColumn({ name: req.body.pic_name, user_id: user_id, comment: req.body.comment })
+    if (!responseData) {
+      res.render('error', { message: `Failed to create the image contents for:  ${req.body.pic_name}, `, title: "Adding Picture column failed" })
+    }
+    res.redirect(`/showPics?id=${user_id}`);
+  } catch (ex) {
+    res.render("error", { message: "Error connecting to MySQL" });
+    console.log("Error connecting to MySQL");
+    console.log(ex);
+  }
+});
+
+router.get("/displayImage", async (req, res) => {
+  console.log("dispalyImage page");
+  try {
+    let user_id = req.session.userID;
+    let picture_UUID = req.query.uuid;
+    let responseData = await db_image.getImage({ picture_UUID: picture_UUID })
+    if (!responseData) {
+      res.render('error', { message: `Failed to retrieve columns, ` })
+    }
+    const picture = responseData[0].filter(pic => pic.picture_UUID === picture_UUID);
+    console.log("whats the picture", picture)
+    if (req.session.authenticated) {
+      var isLoggedIn = true;
+    } else {
+      var isLoggedIn = false;
+    }
+
+    res.render('displayImage', { allPics: picture, user_id: user_id, isLoggedIn: isLoggedIn });
+
+  } catch (ex) {
+    res.render("error", { message: "Error connecting to MongoDB" });
+    console.log("Error connecting to MongoDB");
+    console.log(ex);
+  }
+});
+
+
+router.post("/setUserPic", sessionValidation, upload.single("image"), function(req, res, next) {
+  let picture_UUID = req.body.pic_id;
+  let user_id = req.session.userID;
+  let buf64 = req.file.buffer.toString("base64");
+  stream = cloudinary.uploader.upload(
+    "data:image/octet-stream;base64," + buf64,
+    async function(result) {
+      try {
+        console.log("userId: " + user_id);
+        console.log("pcitureUUID: " + picture_UUID);
+        const schema = Joi.object({
+          user_id: Joi.number().integer().min(1).required(),
+        });
+
+        const validationResult = schema.validate({ user_id });
+        if (validationResult.error != null) {
+          console.log(validationResult.error);
+
+          res.render("error", { message: "Invalid pet_id or user_id" });
+          return;
+        }
+
+        console.log("cloudinary link", result.url)
+        console.log("cloudinary link", result.public_id)
+        console.log("cloudinary link", req.session.userID)
+        let responseData = await db_image.insertImage({ link: result.url, public_id: result.public_id, picture_UUID: picture_UUID })
+        if (!responseData) {
+          res.render('error', { message: `Failed to create the image contents for` })
+        }
+        res.redirect(`/showPics?id=${user_id}`);
+        // }
+      } catch (ex) {
+        res.render("error", { message: "Error connecting to MongoDB" });
+        console.log("Error connecting to MongoDB");
+        console.log(ex);
+      }
+    },
+  );
+  console.log(req.body);
+  console.log(req.file);
+});
+
+router.get('/deletePics', sessionValidation, async (req, res) => {
+  try {
+    console.log("delete image");
+    let user_id = req.session.userID;
+    let picture_UUID = req.query.picture_UUID;
+    console.log(picture_UUID)
+    const schema = Joi.object(
+      {
+        user_id: Joi.number().integer().min(1).required(),
+      });
+    const validationResult = schema.validate({ user_id });
+    if (validationResult.error != null) {
+      console.log(validationResult.error);
+      res.render('error', { message: 'Invalid user_id ' });
+      return;
+    }
+
+    console.log("delete User Image: ");
+    let responseData = await db_image.deleteImage({ picture_UUID: picture_UUID })
+    if (!responseData) {
+      res.render('error', { message: `Failed to delete the image` })
+    }
+
+    res.redirect(`/showPics`);
+  }
+  catch (ex) {
+    res.render('error', { message: 'Error connecting to MySQL' });
+    console.log("Error connecting to MySQL");
+    console.log(ex);
+  }
+});
 
 
 
