@@ -1,1 +1,34 @@
-<p>Is working?</p>
+<%if (locals.rootMessages) {%>
+  <%let i=0; %>
+    <%for (i=0; i < rootMessages.length; i++) { %>
+      <div class='column is-10 is-offset-1 has-text-centered'>
+        <a href="/threads?root_id=<%= rootMessages[i]['text_info_id']%>">
+          <article class="message is-primary" style="width: 100%;">
+            <div class="message-header">
+              <p>
+                <%= rootMessages[i].title %>
+              </p>
+            </div>
+            <div class="message-body">
+              <%= rootMessages[i].text %>
+            </div>
+          </article>
+        </a>
+      </div>
+      <%}%>
+        <%}%>
+
+
+
+          <!-- <div class='column is-10 is-offset-1 has-text-centered'> -->
+          <!--   <a href="https://example.com"> -->
+          <!--     <article class="message is-primary" style="width: 100%;"> -->
+          <!--       <div class="message-header"> -->
+          <!--         <p>Thread title</p> -->
+          <!--       </div> -->
+          <!--       <div class="message-body"> -->
+          <!--         Thread contents -->
+          <!--       </div> -->
+          <!--     </article> -->
+          <!--   </a> -->
+          <!-- </div> -->
