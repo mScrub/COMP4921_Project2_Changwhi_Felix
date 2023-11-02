@@ -1,6 +1,6 @@
 const mySqlDatabase = include('databaseConnectionSQL');
 
-async function getRootMessages(data) {
+async function getRootMessages() {
   try {
     let insertSQL = `SELECT * 
 FROM text_info_dbp2 as t 
