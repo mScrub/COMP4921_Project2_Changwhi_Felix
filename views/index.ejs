@@ -102,6 +102,7 @@
           </div>
 
           <div class='threadContent' style='display: none'>
+
             <%- include("templates/threads") %>
           </div>
 
@@ -140,7 +141,6 @@
         if (!threadIcon.classList.contains('is-active')) {
           threadIcon.classList.add('is-active');
         }
-
         bestContent.style.display = 'none';
         threadContent.style.display = 'block';
       }
