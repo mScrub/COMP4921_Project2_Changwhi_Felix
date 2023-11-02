@@ -115,6 +115,24 @@ async function deleteImage(data) {
 }
 
 
+async function getThreads(data) {
+  try {
+    let getThreadSQL = `
+    SELECT COUNT(text) as num_of_comments, user_id
+    FROM text_info_dbp2
+    GROUP by user_id
+    HAVING user_id = 51; `
 
-module.exports = { insertImage, getImage, addColumn, getColumn, deleteImage }
+    let params = [data.user_id]
+    await mySqlDatabase.query(getThreadSQL)
+    console.log("Successfully obtained threads")
+    return true;
+  } catch (err) {
+    console.log(err);
+    return false;
+  }
+}
+
+
+module.exports = { insertImage, getImage, addColumn, getColumn, deleteImage, getThreads}
 

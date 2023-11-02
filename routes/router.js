@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 require("dotenv").config();
 // mySQL
 const db_users = include('database/users');
-const db_image = include('database/picture');
+const db_profile = include('database/profile');
 
 const saltRounds = 12;
 const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
@@ -227,12 +227,14 @@ router.get("/showProfile", sessionValidation, async (req, res) => {
       return;
     }
     console.log("Retrieving column and ", req.session.userID)
-    let responseData = await db_image.getColumn({ user_id: user_id })
+    let responseData = await db_profile.getColumn({ user_id: user_id })
+    let threadResponse = await db_profile.getThreads()
+    console.log(threadResponse)
     console.log("in show pices", responseData[0])
     if (!responseData) {
       res.render('error', { message: `Failed to retrieve columns, ` })
     }
-    res.render('profile', { allPics: responseData[0], user_id: user_id, name: name});
+    res.render('profile', { allPics: responseData[0], user_id: user_id, name: name, allThreads: threadResponse});
 
   } catch (ex) {
     res.render("error", { message: "Error connecting to MongoDB" });
@@ -262,7 +264,7 @@ router.post("/addpic", async (req, res) => {
     }
 
     console.log("addColumn and ", req.session.userID)
-    let responseData = await db_image.addColumn({ name: req.body.pic_name, user_id: user_id})
+    let responseData = await db_profile.addColumn({ name: req.body.pic_name, user_id: user_id})
     if (!responseData) {
       res.render('error', { message: `Failed to create the image contents for:  ${req.body.pic_name}, `, title: "Adding Picture column failed" })
     }
@@ -299,7 +301,7 @@ router.post("/setUserPic", sessionValidation, upload.single("image"), function(r
         console.log("cloudinary link", result.url)
         console.log("cloudinary link", result.public_id)
         console.log("cloudinary link", req.session.userID)
-        let responseData = await db_image.insertImage({ link: result.url, public_id: result.public_id, picture_UUID: picture_UUID })
+        let responseData = await db_profile.insertImage({ link: result.url, public_id: result.public_id, picture_UUID: picture_UUID })
         if (!responseData) {
           res.render('error', { message: `Failed to create the image contents for` })
         }
@@ -331,7 +333,7 @@ router.get('/deleteProfilePic', sessionValidation, async (req, res) => {
       res.render('error', { message: 'Invalid user_id ' });
       return;
     }
-    let responseData = await db_image.deleteImage({ picture_UUID: picture_UUID })
+    let responseData = await db_profile.deleteImage({ picture_UUID: picture_UUID })
     if (!responseData) {
       res.render('error', { message: `Failed to delete the image` })
     }
