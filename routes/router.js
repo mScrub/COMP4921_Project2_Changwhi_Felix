@@ -9,6 +9,10 @@ const db_users = include('database/users');
 const saltRounds = 12;
 const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
+// For messages
+const db_messages = include('database/threads');
+
+
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
@@ -58,10 +62,12 @@ function sessionValidation(req, res, next) {
   }
 }
 
-router.get("/", (req, res) => {
+router.get("/", async (req, res) => {
   console.log("idex page hit")
+  const responseData = await db_messages.getRootMessages();
+  console.log("router / " + responseData[0][1].text)
   const isLoggedIn = isValidSession(req)
-  res.render("index", { isLoggedIn: isLoggedIn })
+  res.render("index", { isLoggedIn: isLoggedIn, rootMessages: responseData[0] })
 })
 
 
@@ -186,6 +192,16 @@ router.get('/profile', (req, res) => {
 })
 
 
+router.get('/threads', sessionValidation, (req, res) => {
+  const root_id = req.query.root_id;
+  const user_id = req.session.user_id;
+  console.log("in thread " + user_id)
+
+  console.log(root_id)
+  res.render('thred', { root_thread_id: root_id })
+
+
+})
 
 
 
