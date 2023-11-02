@@ -17,9 +17,7 @@ async function createUser(postData) {
 
 	try {
 		const results = await mySqlDatabase.query(createUserSQL, params);
-
         console.log("Successfully created user");
-		// console.log(results[0]);
 		return true;
 	}
 	catch(err) {
@@ -31,7 +29,7 @@ async function createUser(postData) {
 
 async function getUsers() {
 	let getUsersSQL = `
-		SELECT hashed_password, email, user_id, user_type_id
+		SELECT hashed_password, email, user_id, user_type_id, name
 		FROM user;
 	`;
 

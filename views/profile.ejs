@@ -16,8 +16,8 @@
             <h1 class="title is-1">Profile</h1>
           </div>
           <div class="column is-centered">
-            <span style="padding-right: 16px;" style="margin-bottom: 0;" class="title is-4">Name: </span>
-            <span class="title is-6">Changwhi's</span>
+            <span style="padding-right: 16px; margin-bottom: 0;" class="title is-4">Name: </span>
+            <span class="title is-6"><%= name %></span>
           </div>
           <div class="column is-centered" style="display: flex; align-items: center;">
             <span style="padding-right: 16px;" class="title is-4">Picture: </span>
@@ -73,7 +73,7 @@
                           </td>
                           <td>
                             <a
-                              href="/deletePics?id=<%= allPics[i]['public_id']%>&picture_UUID=<%= allPics[i]['picture_UUID']%>&pic=<%=true%>">
+                              href="/deleteProfilePic?id=<%= allPics[i]['public_id']%>&picture_UUID=<%= allPics[i]['picture_UUID']%>&pic=<%=true%>">
                               <span class="icon is-small">
                                 <i class="fas fa-eraser"></i>
                               </span>

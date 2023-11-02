@@ -9,7 +9,7 @@ const db_users = include('database/users');
 const db_image = include('database/picture');
 
 const saltRounds = 12;
-const expireTime = 24 * 60 * 60 * 1000; // session expire time, persist for 1 hour.
+const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
 
 
 const cloudinary = require("cloudinary");
@@ -151,6 +151,7 @@ router.post("/loggingin", async (req, res) => {
   const isValidPassword = bcrypt.compareSync(password, user.hashed_password);
   if (isValidPassword) {
     req.session.userID = user.user_id;
+    req.session.name = user.name
     console.log(user.user_id, "+in loggedin");
     req.session.authenticated = true;
     req.session.email = email;
@@ -197,17 +198,19 @@ router.post("/submitUser", async (req, res) => {
   }
 });
 
-router.get('/profile', (req, res) => {
+router.get('/profile', sessionValidation, (req, res) => {
   const isLoggedIn = isValidSession(req)
-  res.render('profile', { message: "Profile", isLoggedIn: isLoggedIn})
+  let name = req.session.name
+  res.render('profile', { message: "Profile", isLoggedIn: isLoggedIn, name: name})
 })
 
 // BEAUTIFUL PICTURES OF CHANGWHI~ */
 
-router.get("/showPics", sessionValidation, async (req, res) => {
+router.get("/showProfile", sessionValidation, async (req, res) => {
   console.log("picture page");
   try {
     let user_id = req.session.userID;
+    let name = req.session.name;
     //req.query.id;
     console.log("userId: " + user_id);
 
@@ -229,7 +232,7 @@ router.get("/showPics", sessionValidation, async (req, res) => {
     if (!responseData) {
       res.render('error', { message: `Failed to retrieve columns, ` })
     }
-    res.render('profile', { allPics: responseData[0], user_id: user_id });
+    res.render('profile', { allPics: responseData[0], user_id: user_id, name: name});
 
   } catch (ex) {
     res.render("error", { message: "Error connecting to MongoDB" });
@@ -247,12 +250,10 @@ router.post("/addpic", async (req, res) => {
     const schema = Joi.object({
       user_id: Joi.number().integer().min(1).required(),
       name: Joi.string().alphanum().min(2).max(50).required(),
-      // comment: Joi.string().alphanum().min(0).max(150).required(),
     });
     const validationResult = schema.validate({
       user_id,
       name: req.body.pic_name,
-      // comment: req.body.comment,
     });
     if (validationResult.error != null) {
       console.log(validationResult.error);
@@ -261,44 +262,17 @@ router.post("/addpic", async (req, res) => {
     }
 
     console.log("addColumn and ", req.session.userID)
-    let responseData = await db_image.addColumn({ name: req.body.pic_name, user_id: user_id, comment: req.body.comment })
+    let responseData = await db_image.addColumn({ name: req.body.pic_name, user_id: user_id})
     if (!responseData) {
       res.render('error', { message: `Failed to create the image contents for:  ${req.body.pic_name}, `, title: "Adding Picture column failed" })
     }
-    res.redirect(`/showPics?id=${user_id}`);
+    res.redirect(`/showProfile?id=${user_id}`);
   } catch (ex) {
     res.render("error", { message: "Error connecting to MySQL" });
     console.log("Error connecting to MySQL");
     console.log(ex);
   }
 });
-
-router.get("/displayImage", async (req, res) => {
-  console.log("dispalyImage page");
-  try {
-    let user_id = req.session.userID;
-    let picture_UUID = req.query.uuid;
-    let responseData = await db_image.getImage({ picture_UUID: picture_UUID })
-    if (!responseData) {
-      res.render('error', { message: `Failed to retrieve columns, ` })
-    }
-    const picture = responseData[0].filter(pic => pic.picture_UUID === picture_UUID);
-    console.log("whats the picture", picture)
-    if (req.session.authenticated) {
-      var isLoggedIn = true;
-    } else {
-      var isLoggedIn = false;
-    }
-
-    res.render('displayImage', { allPics: picture, user_id: user_id, isLoggedIn: isLoggedIn });
-
-  } catch (ex) {
-    res.render("error", { message: "Error connecting to MongoDB" });
-    console.log("Error connecting to MongoDB");
-    console.log(ex);
-  }
-});
-
 
 router.post("/setUserPic", sessionValidation, upload.single("image"), function(req, res, next) {
   let picture_UUID = req.body.pic_id;
@@ -329,7 +303,7 @@ router.post("/setUserPic", sessionValidation, upload.single("image"), function(r
         if (!responseData) {
           res.render('error', { message: `Failed to create the image contents for` })
         }
-        res.redirect(`/showPics?id=${user_id}`);
+        res.redirect(`/showProfile?id=${user_id}`);
         // }
       } catch (ex) {
         res.render("error", { message: "Error connecting to MongoDB" });
@@ -342,12 +316,11 @@ router.post("/setUserPic", sessionValidation, upload.single("image"), function(r
   console.log(req.file);
 });
 
-router.get('/deletePics', sessionValidation, async (req, res) => {
+router.get('/deleteProfilePic', sessionValidation, async (req, res) => {
   try {
     console.log("delete image");
     let user_id = req.session.userID;
     let picture_UUID = req.query.picture_UUID;
-    console.log(picture_UUID)
     const schema = Joi.object(
       {
         user_id: Joi.number().integer().min(1).required(),
@@ -358,14 +331,12 @@ router.get('/deletePics', sessionValidation, async (req, res) => {
       res.render('error', { message: 'Invalid user_id ' });
       return;
     }
-
-    console.log("delete User Image: ");
     let responseData = await db_image.deleteImage({ picture_UUID: picture_UUID })
     if (!responseData) {
       res.render('error', { message: `Failed to delete the image` })
     }
 
-    res.redirect(`/showPics`);
+    res.redirect(`/showProfile`);
   }
   catch (ex) {
     res.render('error', { message: 'Error connecting to MySQL' });
