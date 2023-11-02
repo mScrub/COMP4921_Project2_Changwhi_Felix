@@ -10,6 +10,8 @@ left join (
     group by ancestor
 ) as c
 on t.text_info_id = c.ancestor
+left join user as u
+on t.user_id = u.user_id
 where path_length = 0`
     let responseData = await mySqlDatabase.query(insertSQL);
     console.log(`Successfully retrieve root messages`)
