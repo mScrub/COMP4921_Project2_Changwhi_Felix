@@ -60,12 +60,12 @@
                           </div>
                           &nbsp;
                           <div class="field">
-                            <button class="button is-link is-small">
-                              <span>Upload</span>
-                              <span class="icon is-small">
-                                <i class="fas fa-image"></i>
-                              </span>
-                            </button>
+                              <button class="button is-link is-small">
+                                <span>Upload</span>
+                                <span class="icon is-small">
+                                  <i class="fas fa-image"></i>
+                                </span>
+                              </button>
                           </div>
                         </div>
                       </form>
@@ -114,21 +114,49 @@
         <div class="column is-12">
           <div class="threads-section">
             <div class="columns is-centered">
-              <table class="table">
-                <thead>
-                  <tr>
-                    <th>Threads</th>
-                    <th># Comments</th>
-                    <th># Likes</th>
-                    <th>Last Update</th>
-                  </tr>
-                </thead>
-                <tbody>
-                </tbody>
-              </table>
+              <div class="table-container">
+                <div class="table-header">
+                  <table class="table is-hoverable is-striped is-fullwidth">
+                    <thead>
+                      <tr>
+                        <th style="padding-right: 50px;">Posts</th>
+                        <th># Comments</th>
+                        <th># Likes</th>
+                        <th>Last Update</th>
+                      </tr>
+                    </thead>
+                  </table>
+                </div>
+                <% if (locals.listOfOwnText && locals.listOfOwnText.length > 0) { %>
+                <table class="table">
+                  <% let i = 0; %>
+                  <tbody>
+                    <% for (i; i < listOfOwnText[0].length; i++) { %>
+                      <tr>
+                        <td>
+                          <span><%= listOfOwnText[0][i].title %></span>
+                        </td>
+                        <td>
+                          <span><%= listOfOwnText[0][i].text %></span>
+                        </td>
+                        <td>
+                          <span><%= listOfOwnText[0][i].likes %></span>
+                        </td>
+                        <td>
+                          <span><%= listOfOwnText[0][i].created.toISOString().split('T')[0] %></span>                        </td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+                <% } %>
+              </div>
+            </div>
+            <div class="columns-is-centered">
+              <div class="table-container">
+              </div>
             </div>
             <div class="column is-centered">
-              <form action="/addThread" method="post" style="text-align: center;">
+              <form action="/createPost" method="get" style="text-align: center;">
                 <div class="flex-container" style="display: flex; align-items: center; justify-content: center;">
                   <button class="button is-primary is-rounded">
                     <span class="icon is-small">

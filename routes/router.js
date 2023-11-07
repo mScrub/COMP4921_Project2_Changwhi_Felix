@@ -198,16 +198,18 @@ router.post("/submitUser", async (req, res) => {
   }
 });
 
-router.get('/profile', sessionValidation, (req, res) => {
-  const isLoggedIn = isValidSession(req)
+router.get('/profile', sessionValidation, async (req, res) => {
+  isLoggedIn = isValidSession(req)
   let name = req.session.name
-  res.render('profile', { message: "Profile", isLoggedIn: isLoggedIn, name: name})
+  let user_id = req.session.userID;
+  const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
+  console.log(resultOfOwnText)
+  res.render('profile', { listOfOwnText: resultOfOwnText, message: "Profile", isLoggedIn: isLoggedIn, name: name})
 })
 
 // BEAUTIFUL PICTURES OF CHANGWHI~ */
 
 router.get("/showProfile", sessionValidation, async (req, res) => {
-  console.log("picture page");
   try {
     let user_id = req.session.userID;
     let name = req.session.name;
@@ -226,6 +228,7 @@ router.get("/showProfile", sessionValidation, async (req, res) => {
       res.render("error", { message: "Invalid user_id" });
       return;
     }
+    const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
     console.log("Retrieving column and ", req.session.userID)
     let responseData = await db_profile.getColumn({ user_id: user_id })
     let threadResponse = await db_profile.getThreads()
@@ -234,7 +237,7 @@ router.get("/showProfile", sessionValidation, async (req, res) => {
     if (!responseData) {
       res.render('error', { message: `Failed to retrieve columns, ` })
     }
-    res.render('profile', { allPics: responseData[0], user_id: user_id, name: name, allThreads: threadResponse});
+    res.render('profile', {allPics: responseData[0], listOfOwnText: resultOfOwnText, user_id: user_id, name: name, allThreads: threadResponse});
 
   } catch (ex) {
     res.render("error", { message: "Error connecting to MongoDB" });
@@ -344,6 +347,40 @@ router.get('/deleteProfilePic', sessionValidation, async (req, res) => {
     res.render('error', { message: 'Error connecting to MySQL' });
     console.log("Error connecting to MySQL");
     console.log(ex);
+  }
+});
+
+
+router.get('/createPost', async (req, res) => {
+  const isLoggedIn = isValidSession(req)
+  res.render('postForm', {isLoggedIn: isLoggedIn})
+})
+
+
+router.post('/submitPost', async (req, res) => {
+  const isLoggedIn = isValidSession(req)
+  let textTitle = req.body.text_title;
+  let user_id = req.session.userID;
+  let textContent = req.body.text_content;
+  let name = req.session.name;
+  const textExists = await db_profile.doesTextExist({ user_id: user_id, title: textTitle });
+  if (!textExists) {
+    const textSuccess = await db_profile.createTextPost({ user_id: user_id, title: textTitle, content: textContent});
+    if (textSuccess) {
+      const textInfoID = await db_profile.getTextInfoID({ user_id: user_id });
+      await db_profile.createRootLinkClosure({ text_info_id: textInfoID });
+      // get list of user's own text post
+      const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
+      if (resultOfOwnText) {
+        res.render('profile', { listOfOwnText: resultOfOwnText, isLoggedIn: isLoggedIn, name: name});
+      } else {
+        res.render('error', { message: 'Unable to get thread!', title: 'Thread creation failed!' });
+      }
+    } else {
+      res.render('error', { message: `Failed to create the thread contents for: ${textTitle}`, title: 'Thread creation failed' });
+    }
+  } else {
+    res.render('error', { message: 'Thread with the same title already exists!', title: 'Thread creation failed' });
   }
 });
 

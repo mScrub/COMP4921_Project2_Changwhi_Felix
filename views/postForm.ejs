@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<%- include("templates/header") %>
+<html>
+<body>
+    <section class="section">
+        <div class="maincolumns columns is-desktop is-vcentered">
+            <div class="column is-10 is-offset-1 is-rounded is-light box container" style="border-radius: 25px;">
+                <form action="/submitPost" method="post">
+                    <div class="columns"> 
+                        <div class="column is-7"> 
+                            <h1 class="title is-1">Post<span><i class="far fa-sticky-note fa-lg"></i></span></h1>
+                            <h3 class="title is-6">New Post</h3>
+                            <input class="input is-small" style="width:fit-content; margin-bottom: 5px;" name="text_title" type="text" placeholder="Title">
+                            <textarea class="textarea" name="text_content" placeholder="Text required" rows="10" cols="0"></textarea>
+                            <br>
+                            <button class="button is-dark">
+                              <span>Create a new post</span>
+                                  <span class="icon is-small">
+                                    <i class="far fa-sticky-note"></i>
+                                  </span>
+                            </button>
+                        </div>
+
+                        <div class="column is-4"> 
+
+                            <h3 class="title is-6">My Posts</h3>
+                            <section>
+                                <% if (locals.listOfText) { %>
+                                <table>
+                                    <% let i=0 %>
+                                    <tr>
+                                        <th style="padding-right: 50px;">Text/Paste Title</th>
+                                        <th>Shareable URL</th>
+                                    </tr>
+                                    <% for(i; i < listOfText.length; i++){ %>
+                                    <tr>
+                                        <td style="padding-bottom: 5px;">
+                                            <a href="/<%=listOfText[i].text_UUID %>"><%= listOfText[i].text_title %></a>
+                                        </td>
+                                        <td style="max-width: 200px; overflow: hidden; padding-right: 10px; padding-bottom: 5px;">
+                                            <a style="white-space: wrap;" href="/<%=listOfText[i].text_UUID %>">http://gktaujsqxf.us19.qoddiapp.com/<%= listOfText[i].text_UUID %></a>
+                                        </td>
+                                    </tr>
+                                    <% } %>
+                                </table>
+                                <% } %>
+                            </section>
+                        </div>
+                    </div> 
+                </form>
+            </div>
+        </div>
+    </section>
+</body>
+
+</html>

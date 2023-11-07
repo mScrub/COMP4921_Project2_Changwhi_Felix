@@ -1,4 +1,3 @@
-
 const mySqlDatabase = include('databaseConnectionSQL');
 
 async function insertImage(data) {
@@ -23,8 +22,7 @@ async function insertImage(data) {
     await mySqlDatabase.query(insertImageSQL, params);
     console.log("Successfully created image");
     return true;
-  }
-  catch (err) {
+  } catch (err) {
     console.log("Error inserting image");
     console.log(err);
     return false;
@@ -54,8 +52,7 @@ async function addColumn(data) {
     await mySqlDatabase.query(insertImageSQL, params);
     console.log("Successfully created column");
     return true;
-  }
-  catch (err) {
+  } catch (err) {
     console.log("Error adding column");
     console.log(err);
     return false;
@@ -73,8 +70,7 @@ async function getColumn(data) {
     let responseData = await mySqlDatabase.query(insertImageSQL, params);
     console.log("Successfully retrieved column");
     return responseData;
-  }
-  catch (err) {
+  } catch (err) {
     console.log("Error retrieving column");
     console.log(err);
     return false;
@@ -89,8 +85,7 @@ async function getImage(data) {
     let responseData = await mySqlDatabase.query(insertImageSQL, params);
     console.log("Successfully retrieved column");
     return responseData;
-  }
-  catch (err) {
+  } catch (err) {
     console.log("Error retrieving column");
     console.log(err);
     return false;
@@ -114,25 +109,124 @@ async function deleteImage(data) {
   }
 }
 
-
-async function getThreads(data) {
+async function createRootLinkClosure(data) {
   try {
-    let getThreadSQL = `
-    SELECT COUNT(text) as num_of_comments, user_id
+    let createRootLinkClosureSQL = `
+    INSERT INTO ClosureTable (ancestor, descendant, path_length)
+    VALUES (:text_info_id, :text_info_id, 0)`
+    let params = {
+      text_info_id : data.text_info_id
+    }
+    await mySqlDatabase.query(createRootLinkClosureSQL, params)
+    return true;
+  } catch (err) {
+    return false
+  }
+}
+
+async function getOwnRootText(data) {
+  try {
+    let getOwnRootTextSQL = `SELECT * 
+    FROM text_info_dbp2 as t 
+    left join (
+	  select ancestor, max(descendant),path_length
+    from ClosureTable
+    group by ancestor
+    ) as c
+    on t.text_info_id = c.ancestor
+    left join user as u
+    on t.user_id = u.user_id
+    where t.user_id = ?`
+    let params = [data.user_id]
+    let responseData = await mySqlDatabase.query(getOwnRootTextSQL, params);
+    console.log(`Successfully retrieve own messages`)
+    return responseData;
+  } catch (err) {
+    console.log("Error for retrieving own messages :" + err);
+    return err;
+
+  }
+}
+
+
+async function getTextInfoID(data) {
+  try {
+    let getTextInfoIDSQL = `
+    SELECT text_info_id
     FROM text_info_dbp2
-    GROUP by user_id
-    HAVING user_id = 51; `
+    WHERE user_id = ?
+    ORDER BY text_info_id DESC
+    LIMIT 1; `
 
     let params = [data.user_id]
-    await mySqlDatabase.query(getThreadSQL)
-    console.log("Successfully obtained threads")
-    return true;
+    const [textInfoID]= await mySqlDatabase.query(getTextInfoIDSQL, params)
+    if (textInfoID && textInfoID.length > 0) {
+      console.log("Successfully obtained text/post id")
+      return textInfoID[0].text_info_id;
+    } else {
+      console.log("No text/post id found")
+      return null;
+    }
   } catch (err) {
     console.log(err);
     return false;
   }
 }
 
+async function doesTextExist(data) {
+  try {
+    const checkTextSQL = `
+      SELECT COUNT(*) AS textCount
+      FROM text_info_dbp2
+      WHERE title = :title AND user_id = :user_id
+    `;
 
-module.exports = { insertImage, getImage, addColumn, getColumn, deleteImage, getThreads}
+    const params = {
+      title: data.title,
+      user_id: data.user_id,
+    };
+    const [result] = await mySqlDatabase.query(checkTextSQL, params);
+    return result[0].textCount > 0;
+  } catch (err) {
+    console.error('Failed to check if the text/post exists');
+    console.error(err);
+    return false;
+  }
+}
 
+
+async function createTextPost(data) {
+  try {
+    let createTextPostSQL = `
+    INSERT INTO text_info_dbp2 (title, text, likes, user_id, created)
+    VALUES (:title, :text, DEFAULT, :user_id, DATE(NOW()))`
+
+    let params = {
+      user_id: data.user_id,
+      title: data.title,
+      text: data.content
+    }
+    await mySqlDatabase.query(createTextPostSQL, params)
+    console.log("Post/Text p1 created successfully")
+    return true;
+
+  } catch (err) {
+    console.log("Failed p1 to created")
+    console.log(err);
+    return false;
+  }
+}
+
+
+module.exports = {
+  insertImage,
+  getImage,
+  addColumn,
+  getColumn,
+  deleteImage,
+  createTextPost,
+  doesTextExist,
+  getTextInfoID,
+  createRootLinkClosure,
+  getOwnRootText,
+}
