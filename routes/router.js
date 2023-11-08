@@ -220,7 +220,6 @@ router.get('/profile', sessionValidation, async (req, res) => {
   let name = req.session.name
   let user_id = req.session.userID;
   const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
-  console.log(resultOfOwnText)
   res.render('profile', { listOfOwnText: resultOfOwnText, message: "Profile", isLoggedIn: isLoggedIn, name: name})
   return;
 })
@@ -381,8 +380,6 @@ router.post('/submitPost', async (req, res) => {
   let user_id = req.session.userID;
   let textContent = req.body.text_content;
   let name = req.session.name;
-  const textExists = await db_profile.doesTextExist({ user_id: user_id, title: textTitle });
-  if (!textExists) {
     const textSuccess = await db_profile.createTextPost({ user_id: user_id, title: textTitle, content: textContent});
     if (textSuccess) {
       const textInfoID = await db_profile.getTextInfoID({ user_id: user_id });
@@ -400,15 +397,8 @@ router.post('/submitPost', async (req, res) => {
       res.render('error', { message: `Failed to create the thread contents for: ${textTitle}`, title: 'Thread creation failed' });
       return;
     }
-  } else {
-    res.render('error', { message: 'Thread with the same title already exists!', title: 'Thread creation failed' });
-    return;
-  }
+
 });
-
-
-
-
 
 
 module.exports = router;
