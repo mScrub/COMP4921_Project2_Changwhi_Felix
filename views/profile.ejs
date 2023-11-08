@@ -115,35 +115,32 @@
           <div class="threads-section">
             <div class="columns is-centered">
               <div class="table-container">
-                <div class="table-header">
-                  <table class="table is-hoverable is-striped is-fullwidth">
-                    <thead>
-                      <tr>
-                        <th style="padding-right: 50px;">Posts</th>
-                        <th># Comments</th>
-                        <th># Likes</th>
-                        <th>Last Update</th>
-                      </tr>
-                    </thead>
-                  </table>
-                </div>
                 <% if (locals.listOfOwnText && locals.listOfOwnText.length > 0) { %>
-                <table class="table">
-                  <% let i = 0; %>
+                <table class="table" style="width: 100%;">
+                  <thead>
+                    <tr>
+                      <th style="text-align: left;">Posts</th>
+                      <th style="text-align: left;"># Comments</th>
+                      <th style="text-align: left;"># Likes</th>
+                      <th style="text-align: left;">Last Update</th>
+                    </tr>
+                  </thead>
                   <tbody>
+                    <% let i = 0; %>
                     <% for (i; i < listOfOwnText[0].length; i++) { %>
                       <tr>
-                        <td>
+                        <td style="width: 50%; text-align: left;">
                           <span><%= listOfOwnText[0][i].title %></span>
                         </td>
-                        <td>
+                        <td style="width: 50%; text-align: left;">
                           <span><%= listOfOwnText[0][i].text %></span>
                         </td>
-                        <td>
+                        <td style="text-align: left;">
                           <span><%= listOfOwnText[0][i].likes %></span>
                         </td>
-                        <td>
-                          <span><%= listOfOwnText[0][i].created.toISOString().split('T')[0] %></span>                        </td>
+                        <td style="text-align: left;">
+                          <span><%= listOfOwnText[0][i].created.toISOString().split('T')[0] %></span>
+                        </td>
                       </tr>
                     <% } %>
                   </tbody>

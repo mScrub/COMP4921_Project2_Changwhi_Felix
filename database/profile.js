@@ -136,7 +136,7 @@ async function getOwnRootText(data) {
     on t.text_info_id = c.ancestor
     left join user as u
     on t.user_id = u.user_id
-    where t.user_id = ?`
+    where t.user_id = ? and c.path_length = 0`
     let params = [data.user_id]
     let responseData = await mySqlDatabase.query(getOwnRootTextSQL, params);
     console.log(`Successfully retrieve own messages`)
