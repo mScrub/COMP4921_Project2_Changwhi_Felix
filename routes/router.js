@@ -7,6 +7,7 @@ require("dotenv").config();
 // mySQL
 const db_users = include('database/users');
 const db_profile = include('database/profile');
+const db_search = include('database/search')
 
 const saltRounds = 12;
 const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
@@ -77,9 +78,23 @@ function sessionValidation(req, res, next) {
 router.get("/", (req, res) => {
   console.log("idex page hit")
   const isLoggedIn = isValidSession(req)
-  res.render("index", { isLoggedIn: isLoggedIn })
+  res.render("index", { isLoggedIn: isLoggedIn})
+  return;
+
 })
 
+router.get('/searchPost', async (req, res) => { 
+  const isLoggedIn = isValidSession(req)
+  let wordToSearch = req.query.searchWord
+  const postSearchResult = await db_search.searchPost({word: wordToSearch})
+  // console.log(postSearchResult)
+  if (wordToSearch === '') {
+    res.render('index', {isLoggedIn: isLoggedIn, listOfPosts: [{title:"", text:"Literally nothing OuO!"}]});
+    return; 
+  }
+  res.render("index", {isLoggedIn: isLoggedIn, listOfPosts: postSearchResult})
+  return;
+})
 
 
 // Sign up and Login
@@ -87,6 +102,7 @@ router.get("/", (req, res) => {
 router.get("/login", async (req, res) => {
   const isLoggedIn = isValidSession(req)
   res.render("login", { isLoggedIn: isLoggedIn, message: null });
+  return;
 
 });
 
@@ -107,6 +123,7 @@ router.get("/signup", async (req, res) => {
   console.log("checking" + req.query.invalid)
   var invalid = req.query.invalid === undefined ? true : req.query.invalid;
   res.render("signup", { invalid: invalid, isLoggedIn: false });
+  return;
 
 });
 
@@ -205,6 +222,7 @@ router.get('/profile', sessionValidation, async (req, res) => {
   const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
   console.log(resultOfOwnText)
   res.render('profile', { listOfOwnText: resultOfOwnText, message: "Profile", isLoggedIn: isLoggedIn, name: name})
+  return;
 })
 
 // BEAUTIFUL PICTURES OF CHANGWHI~ */
@@ -373,16 +391,21 @@ router.post('/submitPost', async (req, res) => {
       const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
       if (resultOfOwnText) {
         res.render('profile', { listOfOwnText: resultOfOwnText, isLoggedIn: isLoggedIn, name: name});
+        return;
       } else {
         res.render('error', { message: 'Unable to get thread!', title: 'Thread creation failed!' });
+        return;
       }
     } else {
       res.render('error', { message: `Failed to create the thread contents for: ${textTitle}`, title: 'Thread creation failed' });
+      return;
     }
   } else {
     res.render('error', { message: 'Thread with the same title already exists!', title: 'Thread creation failed' });
+    return;
   }
 });
+
 
 
 

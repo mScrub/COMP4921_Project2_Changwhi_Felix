@@ -66,27 +66,34 @@
 
             <div class='column is-10 is-offset-1 has-text-centered'>
               <h1 class="title"> Search </h1>
-              <div class="panel-block">
-                <p class="control has-icons-left">
-                  <input class="input is-primary" type="text" placeholder="Search">
-                  <span class="icon is-left">
-                    <i class="fas fa-search" aria-hidden="true"></i>
+              <form id=searchForm action="/searchPost" method="get">
+                <div class="panel-block">
+                  <p class="control has-icons-left">
+                    <input class="input is-primary" type="text" placeholder="Search" name="searchWord">
+                    <span class="icon is-left">
+                      <i class="fas fa-search" aria-hidden="true"></i>
+                    </span>
+                  </p>
+                </div>
+              </form>
+              <% if (locals.listOfPosts) { %>
+                <% for (var i = 0; i < locals.listOfPosts.length; i++) { %>
+                <a class="panel-block">
+                  <span class="panel-icon">
+                    <i class="fas fa-book" aria-hidden="true"></i>
                   </span>
-                </p>
-              </div>
-              <a class="panel-block is-active">
+                  <%= listOfPosts[i].title %>&nbsp;&mdash;&nbsp;
+                  <%= listOfPosts[i].text %>
+                </a>
+                <% } %>
+              <% } %> 
+              <!-- <a class="panel-block is-active">
                 <span class="panel-icon">
                   <i class="fas fa-book" aria-hidden="true"></i>
                 </span>
                 bulma
-              </a>
-              <a class="panel-block">
-                <span class="panel-icon">
-                  <i class="fas fa-book" aria-hidden="true"></i>
-                </span>
-                marksheet
-              </a>
-              <a class="panel-block">
+              </a> -->
+              <!-- <a class="panel-block">
                 <span class="panel-icon">
                   <i class="fas fa-book" aria-hidden="true"></i>
                 </span>
@@ -97,7 +104,7 @@
                   <i class="fas fa-book" aria-hidden="true"></i>
                 </span>
                 jgthms.github.io
-              </a>
+              </a> -->
             </div>
           </div>
 
@@ -144,6 +151,15 @@
         bestContent.style.display = 'none';
         threadContent.style.display = 'block';
       }
+
+      const inputField = document.querySelector('input[name="searchWord"]');
+      const searchForm = document.getElementById('searchForm');
+      inputField.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+          searchForm.submit();
+        }
+      });
+
     </script>
   </body>
 
