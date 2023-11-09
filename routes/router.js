@@ -8,6 +8,7 @@ require("dotenv").config();
 const db_users = include('database/users');
 const db_profile = include('database/profile');
 const db_search = include('database/search')
+const db_messages = include('database/threads')
 
 const saltRounds = 12;
 const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
