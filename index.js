@@ -5,7 +5,7 @@ global.abs_path = function(path) {
 global.include = function(file) {
   return require(abs_path('/' + file));
 }
-
+require('dotenv').config();
 const express = require('express');
 const router = include('routes/router')
 
