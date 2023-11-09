@@ -12,7 +12,6 @@ const expireTime = 60 * 60 * 1000; // session expire time, persist for 1 hour.
 // For messages
 const db_messages = include('database/threads');
 
-
 const mongodb_user = process.env.MONGODB_USER;
 const mongodb_password = process.env.MONGODB_PASSWORD;
 const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
@@ -65,9 +64,13 @@ function sessionValidation(req, res, next) {
 router.get("/", async (req, res) => {
   console.log("idex page hit")
   const responseData = await db_messages.getRootMessages();
-  console.log("router / " + responseData[0][1].text)
+  console.log("router / " + responseData)
   const isLoggedIn = isValidSession(req)
-  res.render("index", { isLoggedIn: isLoggedIn, rootMessages: responseData[0] })
+
+  const top3messages = await db_messages.getTop3Message();
+  // const top3messagesData = JSON.stringify(top3messages)
+  console.log("dherhaer :" + top3messages[0][0].title)
+  res.render("index", { isLoggedIn: isLoggedIn, rootMessages: responseData[0], top3message: top3messages[0] })
 })
 
 
@@ -145,7 +148,7 @@ router.post("/loggingin", async (req, res) => {
     req.session.authenticated = true;
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
-    res.render("index", { isLoggedIn: true })
+    res.redirect("/")
   } else {
     req.session.authenticated = false;
     res.redirect('/login');
@@ -192,18 +195,63 @@ router.get('/profile', (req, res) => {
 })
 
 
-router.get('/threads', sessionValidation, (req, res) => {
+router.get('/threads', async (req, res) => {
   const root_id = req.query.root_id;
-  const user_id = req.session.user_id;
-  console.log("in thread " + user_id)
+  const responseData = await db_messages.getMessageWithChilds(root_id);
+  const isLoggedIn = isValidSession(req);
+  const user_id = req.session.userID;
+  if (user_id == "undefined") {
+    user_id = null;
+  }
+  res.render('thread', { isLoggedIn: isLoggedIn, user_id: user_id, messages: responseData[0], root_thread_id: root_id });
+});
 
-  console.log(root_id)
-  res.render('thred', { root_thread_id: root_id })
+router.post('/submitReply', sessionValidation, async (req, res) => {
+  try {
+    const replyText = req.body.replyText;
+    const replyTitle = req.body.replyTitle;
+    const path_length = parseInt(req.body.path_length) + 1;
+    const commentId = req.body.commentId;
+    const root_thread_id = req.body.rootThreadId;
+    const user_id = req.session.userID;
+    const response1 = await db_messages.addMessage({ text: replyText, title: replyTitle, user_id: user_id });
+    const message_id = JSON.stringify(response1[0].insertId);
+    const current_parent_id = commentId;
+    const response2 = await db_messages.addClosureTable({ path_length: path_length, message_id: message_id, current_parent_id: current_parent_id });
+    console.log(JSON.stringify(response2));
 
+    res.redirect('/threads?root_id=' + root_thread_id);
 
+  } catch (err) {
+    console.log("Submiting replay is wrong" + err)
+  }
+
+});
+
+router.get('/remove/message', sessionValidation, async (req, res) => {
+  const id = req.query.id;
+  const root_id = req.query.root_id;
+  const response = await db_messages.removeMessage({ text_id: id });
+  console.log("Id : " + id)
+  if (response) {
+    res.redirect(`/threads?root_id=` + root_id)
+    return;
+  }
+  res.render('error', { message: `Fail to remove message..` });
+  return;
 })
 
-
+router.get('/likes', sessionValidation, async (req, res) => {
+  const id = req.query.id;
+  const root_id = req.query.root_id;
+  const response = await db_messages.incrementLikes({ text_id: id });
+  if (response) {
+    res.redirect(`/threads?root_id=` + root_id)
+    return;
+  }
+  res.render('error', { message: `Fail to increament likes` });
+  return;
+})
 
 module.exports = router;
 

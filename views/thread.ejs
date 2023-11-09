@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<%- include("templates/header") %>
+
+  <style>
+    .small-button {
+      font-size: 12px;
+      padding: 5px 10px;
+      width: 50%;
+    }
+
+    .card {
+      position: relative;
+      padding-left: 20px;
+    }
+
+    .card:before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      height: 100%;
+      width: 2px;
+      background-color: #0079d3;
+    }
+
+    .card-footer {
+      width: 50%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .card-footer {}
+  </style>
+
+  <script>
+    function toggleReply(commentId) {
+      var x = document.getElementById(commentId);
+      var button = document.getElementById("button_" + commentId);
+      if (x.style.display === "block") {
+        x.style.display = "none";
+        button.textContent = "Reply";
+        button.style.display = "block";
+      } else {
+        x.style.display = "block";
+        button.textContent = "Close";
+        button.style.display = "none";
+      }
+    }
+
+  </script>
+
+  <body>
+    <% function displayComments(comments, parentId, level=-1) { %>
+      <% if (Array.isArray(comments)) { %>
+        <% let childComments=comments.filter(comment=> {
+          return comment.ancestor == parentId;
+          }); %>
+          <% if (childComments.length> 0) { %>
+            <ul style="width: 100%;">
+              <% childComments.forEach(comment=> { %>
+                <% if (comment.text_info_id==comment.ancestor) { %>
+                  <li
+                    style="margin-left: <%= 30 * level %>px; margin-bottom: 30px; display: flex; align-items: center;">
+                    <span class="icon">
+
+                      <i class="fas fa-arrow-right"></i>
+
+                    </span>
+                    <div class="card" style="width: 100%;">
+                      <header class="card-header">
+                        <p class="card-header-title">
+                          Title: <%= comment.title %> Created by: <%= comment.name %>
+                        </p>
+                        <p></p>
+                      </header>
+                      <div class="card-content">
+                        <div class="content">
+                          <%= comment.text %> <br>
+                        </div>
+                      </div>
+                      <footer class="card-footer">
+                        <div class="columns">
+
+                          <div class='column'>
+                            <a href="/likes?id=<%=comment.text_info_id%>&root_id=<%=root_thread_id%>"
+                              id="likes_<%=comment.text_info_id%>">
+                              <span class="icon-text">
+                                <span class="icon">
+                                  <i style="margin-right: 5px;" class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                  <%=comment.likes %>
+                                </span>
+                                <span>
+                                </span>
+                              </span>
+                            </a>
+                          </div>
+                          <div class="column">
+                            <a href="#" id="button_<%= comment.text_info_id %>" class="card-footer-item button is-link "
+                              onclick="toggleReply('<%= comment.text_info_id %>')">Reply</a>
+                          </div>
+                          <% if (comment.user_id==user_id) {%>
+                            <div class="column">
+                              <a href="/remove/message?id=<%=comment.text_info_id%>&root_id=<%=root_thread_id%>"
+                                id="button_<%= comment.text_info_id %>"
+                                class="card-footer-item button is-link">Delete</a>
+                            </div>
+                            <%}%>
+                        </div>
+
+
+                        <div id="<%= comment.text_info_id %>" class="hidden" enctype="multipart/form-data">
+                          <form action='/submitReply' method='post'>
+                            <div class="field">
+                              <label class="label">Title</label>
+                              <div class="control">
+                                <input class="input" type="text" name="replyTitle" placeholder="Enter your title here">
+                              </div>
+                            </div>
+                            <div class="field">
+                              <label class="label">Reply</label>
+                              <div class="control">
+                                <textarea class="textarea" name="replyText"
+                                  placeholder="Enter your reply here"></textarea>
+                              </div>
+                            </div>
+                            <input type="hidden" name="commentId" value="<%= comment.text_info_id %>">
+                            <input type="hidden" name="rootThreadId" value="<%= root_thread_id %>">
+                            <input type="hidden" name="path_length" value="<%= comment.path_length %>">
+                            <div class="field is-grouped is-grouped-right">
+                              <div class="control">
+                                <button type="submit" class="button is-link">Submit</button>
+                              </div>
+                              <div class="control">
+                                <button onclick="toggleReply('<%= comment.text_info_id %>')" type="button"
+                                  class="button is-danger">Close</button>
+                              </div>
+                            </div>
+                          </form>
+                        </div>
+                      </footer>
+                    </div>
+                  </li>
+                  <% } %>
+                    <% if (comment.text_info_id !=comment.ancestor && (comment.path_length -
+                      comment.ancestor_path_length)==1) { %>
+                      <% displayComments(comments, comment.text_info_id, level + 1) %>
+                        <% } %>
+                          <% }); %>
+            </ul>
+            <% } %>
+              <% } %>
+                <% } %>
+
+                  <section class="section has-background-light">
+                    <div class="maincolumns columns is-desktop">
+                      <div class="column is-10 is-offset-1 has-background-white" style="border-radius: 25px;">
+                        <div class='column is-11 is-offset-1 has-text-centered'>
+                          <% if (messages) { %>
+                            <article class="message is-primary" style="width: 100%; margin-bottom: 30px;">
+                              <div class="message-header">
+                                <p>
+                                  <%= messages[0].title %>
+                                </p>
+                                <br>
+                                <p>Created by: <%= messages[0].name %>
+                                </p>
+                              </div>
+                              <div class="message-body">
+                                <%= messages[0].text %>
+                              </div>
+                              <footer class="card-footer">
+                                <div class=columns>
+                                  <div class='column'>
+                                    <a href="/likes?id=<%=messages[0].text_info_id%>&root_id=<%=root_thread_id%>"
+                                      id="likes_<%= messages[0].text_info_id%>">
+                                      <span class="icon-text">
+                                        <span class="icon">
+                                          <i style="margin-right: 5px;" class="fa fa-thumbs-up" aria-hidden="true"></i>
+                                          <%=messages[0].likes %>
+                                        </span>
+                                        <span>
+                                        </span>
+                                      </span>
+                                    </a>
+                                  </div>
+                                  <div class="column">
+                                    <a href="#" id="button_<%= messages[0].text_info_id %>"
+                                      class="card-footer-item button is-link "
+                                      onclick="toggleReply('<%=messages[0].text_info_id %>')">Reply</a>
+                                  </div>
+                                  <% if (messages[0].user_id==user_id) {%>
+                                    <div class="column">
+                                      <a href="/remove/thread?id=<%=messages[0].text_info_id%>&root_id=<%=root_thread_id%>"
+                                        id="button_<%= messages[0].text_info_id %>"
+                                        class="card-footer-item button is-link">Delete</a>
+                                    </div>
+                                    <%}%>
+                                </div>
+                                <div id="<%= messages[0].text_info_id %>" class="hidden" enctype="multipart/form-data">
+                                  <form action='/submitReply' method='post'>
+                                    <div class="field">
+                                      <label class="label">Title</label>
+                                      <div class="control">
+                                        <input class="input" type="text" name="replyTitle"
+                                          placeholder="Enter your title here">
+                                      </div>
+                                    </div>
+                                    <div class="field">
+                                      <label class="label">Reply</label>
+                                      <div class="control">
+                                        <textarea class="textarea" name="replyText"
+                                          placeholder="Enter your reply here"></textarea>
+                                      </div>
+                                    </div>
+                                    <input type="hidden" name="commentId" value="<%= messages[0].text_info_id %>">
+                                    <input type="hidden" name="rootThreadId" value="<%= root_thread_id %>">
+                                    <input type="hidden" name="path_length" value="<%=messages[0].path_length %>">
+                                    <div class="field is-grouped is-grouped-right">
+                                      <div class="control">
+                                        <button type="submit" class="button is-link">Submit</button>
+                                      </div>
+                                      <div class="control">
+                                        <button onclick="toggleReply('<%= messages[0].text_info_id %>')" type="button"
+                                          class="button is-danger">Close</button>
+                                      </div>
+                                    </div>
+                                  </form>
+                                </div>
+                              </footer>
+                            </article>
+                            <% displayComments(messages.slice(1), root_thread_id) %>
+                              <% } %>
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+  </body>
+
+</html>
