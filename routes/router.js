@@ -322,13 +322,13 @@ router.get("/showProfile", sessionValidation, async (req, res) => {
     const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
     console.log("Retrieving column and ", req.session.userID)
     let responseData = await db_profile.getColumn({ user_id: user_id })
-    let threadResponse = await db_profile.getThreads()
-    console.log(threadResponse)
+    // let threadResponse = await db_profile.getTop3Message()
+    // console.log(threadResponse)
     console.log("in show pices", responseData[0])
     if (!responseData) {
       res.render('error', { message: `Failed to retrieve columns, ` })
     }
-    res.render('profile', { allPics: responseData[0], listOfOwnText: resultOfOwnText, user_id: user_id, name: name, allThreads: threadResponse });
+    res.render('profile', { allPics: responseData[0], listOfOwnText: resultOfOwnText, user_id: user_id, name: name });
 
   } catch (ex) {
     res.render("error", { message: "Error connecting to MongoDB" });
