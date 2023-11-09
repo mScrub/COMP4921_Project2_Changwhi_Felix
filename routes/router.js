@@ -221,11 +221,6 @@ router.post("/submitUser", async (req, res) => {
   }
 });
 
-router.get('/profile', (req, res) => {
-  res.render('profile', { message: "Profile", isLoggedIn: false })
-})
-
-
 router.get('/threads', async (req, res) => {
   const root_id = req.query.root_id;
   const responseData = await db_messages.getMessageWithChilds(root_id);
