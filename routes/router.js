@@ -290,7 +290,7 @@ router.get('/likes', sessionValidation, async (req, res) => {
   return;
 })
 router.get('/profile', sessionValidation, async (req, res) => {
-  isLoggedIn = isValidSession(req)
+  let isLoggedIn = isValidSession(req)
   let name = req.session.name
   let user_id = req.session.userID;
   const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
