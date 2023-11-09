@@ -1,7 +1,7 @@
 const mySqlDatabase = include('databaseConnectionSQL');
 
 async function createUser(postData) {
-    let createUserSQL = `
+  let createUserSQL = `
     INSERT INTO user (email, hashed_password, name, user_type_id)
     VALUES (:email, :passwordHash, :name,
         (SELECT user_type_id
@@ -9,11 +9,11 @@ async function createUser(postData) {
          WHERE user_type = "user"));
 	`;
 
-	let params = {
-		email: postData.email,
-		passwordHash: postData.hashedPassword,
-        name: postData.name
-	}
+  let params = {
+    email: postData.email,
+    passwordHash: postData.hashedPassword,
+    name: postData.name
+  }
 
 	try {
 		const results = await mySqlDatabase.query(createUserSQL, params);
@@ -33,18 +33,18 @@ async function getUsers() {
 		FROM user;
 	`;
 
-	try {
-		const results = await mySqlDatabase.query(getUsersSQL);
-		// console.log(results[0]);
-		return results[0];
-	}
-	catch(err) {
-		console.log("Error getting users");
-        console.log(err);
-		return false;
-	}
+  try {
+    const results = await mySqlDatabase.query(getUsersSQL);
+    // console.log(results[0]);
+    return results[0];
+  }
+  catch (err) {
+    console.log("Error getting users");
+    console.log(err);
+    return false;
+  }
 }
 
 
 
-module.exports = {createUser, getUsers};
+module.exports = { createUser, getUsers };

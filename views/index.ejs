@@ -29,38 +29,101 @@
               <h1 class="title">Best Topic</h1>
             </div>
             <div class='columns'>
-              <div class='column is-one-third'>
-                <article class="message is-primary" style="width: 100%;">
-                  <div class="message-header">
-                    <p>First</p>
-                  </div>
-                  <div class="message-body">
-                    Sample1
-                  </div>
-                </article>
-              </div>
 
-              <div class='column is-one-third'>
-                <article class="message is-primary" style="width: 100%;">
-                  <div class="message-header">
-                    <p>Second</p>
-                  </div>
-                  <div class="message-body">
-                    Sample2
-                  </div>
-                </article>
-              </div>
+              <%if (locals.top3message) {%>
+                <% console.log("herer!!!"+top3message)%>
 
-              <div class='column is-one-third'>
-                <article class="message is-primary" style="width: 100%;">
-                  <div class="message-header">
-                    <p>Third</p>
+                  <div class='column is-one-third'>
+
+                    <a href="/threads?root_id=<%=top3message[0]['text_info_id']%>">
+                      <article class="message is-primary" style="width: 100%;">
+                        <div class="message-header">
+                          <p>
+                            <%= top3message[0].title %>
+                          </p>
+                        </div>
+                        <div class="message-body">
+                          <%= top3message[0].text %>
+                        </div>
+                      </article>
+                    </a>
                   </div>
-                  <div class="message-body">
-                    Sample3
+
+                  <div class='column is-one-third'>
+                    <a href="/threads?root_id=<%=top3message[1]['text_info_id']%>">
+                      <article class="message is-primary" style="width: 100%;">
+                        <div class="message-header">
+                          <p>
+                            <%= top3message[1].title %>
+                          </p>
+                        </div>
+                        <div class="message-body">
+                          <%= top3message[1].text %>
+                        </div>
+                      </article>
+                    </a>
                   </div>
-                </article>
-              </div>
+
+
+                  <div class='column is-one-third'>
+                    <a href="/threads?root_id=<%=top3message[2]['text_info_id']%>">
+                      <article class="message is-primary" style="width: 100%;">
+                        <div class="message-header">
+                          <p>
+                            <%= top3message[2].title %>
+                          </p>
+                        </div>
+                        <div class="message-body">
+                          <%= top3message[2].text %>
+                        </div>
+                      </article>
+                    </a>
+                  </div>
+
+                  <%}else{ %>
+
+
+                    <div class='column is-one-third'>
+                      <article class="message is-primary" style="width: 100%;">
+                        <div class="message-header">
+                          <p>First</p>
+                        </div>
+                        <div class="message-body">
+                          Sample1
+                        </div>
+                      </article>
+                    </div>
+
+                    <div class='column is-one-third'>
+                      <article class="message is-primary" style="width: 100%;">
+                        <div class="message-header">
+                          <p>Second</p>
+                        </div>
+                        <div class="message-body">
+                          Sample2
+                        </div>
+                      </article>
+                    </div>
+
+
+                    <div class='column is-one-third'>
+                      <article class="message is-primary" style="width: 100%;">
+                        <div class="message-header">
+                          <p>Third</p>
+                        </div>
+                        <div class="message-body">
+                          Sample3
+                        </div>
+                      </article>
+                    </div>
+
+                    <%}%>
+
+
+
+
+
+
 
             </div>
 
@@ -109,7 +172,8 @@
           </div>
 
           <div class='threadContent' style='display: none'>
-            <p>Hi</p>
+
+            <%- include("templates/threads") %>
           </div>
 
         </div>
@@ -147,7 +211,6 @@
         if (!threadIcon.classList.contains('is-active')) {
           threadIcon.classList.add('is-active');
         }
-
         bestContent.style.display = 'none';
         threadContent.style.display = 'block';
       }
