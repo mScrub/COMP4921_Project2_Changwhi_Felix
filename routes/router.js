@@ -89,16 +89,16 @@ router.get("/", async (req, res) => {
 })
 
 
-router.get('/searchPost', async (req, res) => { 
+router.get('/searchPost', async (req, res) => {
   const isLoggedIn = isValidSession(req)
   let wordToSearch = req.query.searchWord
-  const postSearchResult = await db_search.searchPost({word: wordToSearch})
+  const postSearchResult = await db_search.searchPost({ word: wordToSearch })
   // console.log(postSearchResult)
   if (wordToSearch === '') {
-    res.render('index', {isLoggedIn: isLoggedIn, listOfPosts: [{title:"", text:"Literally nothing OuO!"}]});
-    return; 
+    res.render('index', { isLoggedIn: isLoggedIn, listOfPosts: [{ title: "", text: "Literally nothing OuO!" }] });
+    return;
   }
-  res.render("index", {isLoggedIn: isLoggedIn, listOfPosts: postSearchResult})
+  res.render("index", { isLoggedIn: isLoggedIn, listOfPosts: postSearchResult })
   return;
 })
 
@@ -272,6 +272,17 @@ router.get('/remove/message', sessionValidation, async (req, res) => {
   return;
 })
 
+router.get('/remove/thread', sessionValidation, async (req, res) => {
+  const id = req.query.id;
+  const root_id = req.query.root_id;
+  const response = await db_messages.removeThread({ text_id: id });
+  if (response) {
+    res.redirect(`/`)
+    return;
+  }
+  res.render('error', { message: `Fail to remove thread..` });
+  return;
+})
 router.get('/likes', sessionValidation, async (req, res) => {
   const id = req.query.id;
   const root_id = req.query.root_id;
@@ -288,7 +299,7 @@ router.get('/profile', sessionValidation, async (req, res) => {
   let name = req.session.name
   let user_id = req.session.userID;
   const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
-  res.render('profile', { listOfOwnText: resultOfOwnText, message: "Profile", isLoggedIn: isLoggedIn, name: name})
+  res.render('profile', { listOfOwnText: resultOfOwnText, message: "Profile", isLoggedIn: isLoggedIn, name: name })
   return;
 })
 
@@ -322,7 +333,7 @@ router.get("/showProfile", sessionValidation, async (req, res) => {
     if (!responseData) {
       res.render('error', { message: `Failed to retrieve columns, ` })
     }
-    res.render('profile', {allPics: responseData[0], listOfOwnText: resultOfOwnText, user_id: user_id, name: name, allThreads: threadResponse});
+    res.render('profile', { allPics: responseData[0], listOfOwnText: resultOfOwnText, user_id: user_id, name: name, allThreads: threadResponse });
 
   } catch (ex) {
     res.render("error", { message: "Error connecting to MongoDB" });
@@ -352,7 +363,7 @@ router.post("/addpic", async (req, res) => {
     }
 
     console.log("addColumn and ", req.session.userID)
-    let responseData = await db_profile.addColumn({ name: req.body.pic_name, user_id: user_id})
+    let responseData = await db_profile.addColumn({ name: req.body.pic_name, user_id: user_id })
     if (!responseData) {
       res.render('error', { message: `Failed to create the image contents for:  ${req.body.pic_name}, `, title: "Adding Picture column failed" })
     }
@@ -438,7 +449,7 @@ router.get('/deleteProfilePic', sessionValidation, async (req, res) => {
 
 router.get('/createPost', async (req, res) => {
   const isLoggedIn = isValidSession(req)
-  res.render('postForm', {isLoggedIn: isLoggedIn})
+  res.render('postForm', { isLoggedIn: isLoggedIn })
 })
 
 
@@ -448,23 +459,23 @@ router.post('/submitPost', async (req, res) => {
   let user_id = req.session.userID;
   let textContent = req.body.text_content;
   let name = req.session.name;
-    const textSuccess = await db_profile.createTextPost({ user_id: user_id, title: textTitle, content: textContent});
-    if (textSuccess) {
-      const textInfoID = await db_profile.getTextInfoID({ user_id: user_id });
-      await db_profile.createRootLinkClosure({ text_info_id: textInfoID });
-      // get list of user's own text post
-      const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
-      if (resultOfOwnText) {
-        res.render('profile', { listOfOwnText: resultOfOwnText, isLoggedIn: isLoggedIn, name: name});
-        return;
-      } else {
-        res.render('error', { message: 'Unable to get thread!', title: 'Thread creation failed!' });
-        return;
-      }
+  const textSuccess = await db_profile.createTextPost({ user_id: user_id, title: textTitle, content: textContent });
+  if (textSuccess) {
+    const textInfoID = await db_profile.getTextInfoID({ user_id: user_id });
+    await db_profile.createRootLinkClosure({ text_info_id: textInfoID });
+    // get list of user's own text post
+    const resultOfOwnText = await db_profile.getOwnRootText({ user_id: user_id });
+    if (resultOfOwnText) {
+      res.render('profile', { listOfOwnText: resultOfOwnText, isLoggedIn: isLoggedIn, name: name });
+      return;
     } else {
-      res.render('error', { message: `Failed to create the thread contents for: ${textTitle}`, title: 'Thread creation failed' });
+      res.render('error', { message: 'Unable to get thread!', title: 'Thread creation failed!' });
       return;
     }
+  } else {
+    res.render('error', { message: `Failed to create the thread contents for: ${textTitle}`, title: 'Thread creation failed' });
+    return;
+  }
 
 });
 
